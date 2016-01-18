@@ -28,7 +28,7 @@ To do this:
 
 - compile for an arm running linux (raspberry) on a pc:
 
-> $ GOOS=linux GOARCH=arm GOARM=5 go get github.com/cblomart/zwavemqtt
+> $ GOOS=linux GOARCH=arm GOARM=5 go get github.com/cblomart/zwaymqtt
 
 - copy the necessary files to your Pi:
 
