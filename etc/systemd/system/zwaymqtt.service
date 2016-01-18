@@ -1,0 +1,11 @@
+[Unit]
+Description=Z-Way to MQTT
+Requires=network.target
+
+[Service]
+EnvironmentFile=-/etc/default/zwaymqtt
+ExecStart=/usr/local/bin/zwaymqtt -h $topic_root -m $mqtt_server -p $zway_pass -u $zway_user -s $zway_server -r $refresh 
+#Restart=always
+
+[Install]
+WantedBy=multi-user.target

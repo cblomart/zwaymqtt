@@ -1,0 +1,6 @@
+topic_root=nivelles
+mqtt_server=localhost
+zway_server=localhost
+zway_user=admin
+zway_pass=echelle 
+refresh=3
