@@ -36,7 +36,7 @@ To do this:
 > 
 > $ scp $GOPATH/src/github.com/cblomart/zwaymqtt/etc/default/zwaymqtt pi@raspberry.local:/tmp/
 > 
-> $ scp $GOPATH/bin/github.com/cblomart/zwaymqtt/etc/default/zwaymqtt pi@raspberry.local:/tmp/zwaymqtt.bin
+> $ scp $GOPATH/bin/linux_arm/zwaymqtt pi@raspberry.local:/tmp/zwaymqtt.bin
 
 - on your pi, place the files at the right places:
 
