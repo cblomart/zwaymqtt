@@ -18,6 +18,20 @@ Currently the bridge is limited to certain ZWave classes (see bellow).
 
 ## Instalation
 
+### from release
+
+On your pi:
+
+> $ wget https://github.com/cblomart/zwaymqtt/releases/download/0.1/zwaymqtt-linux-arm5.tgz
+> 
+> sudo tar -zxvf ./zwaymqtt.tgz -C /
+> 
+> sudo vi /etc/default/zwaymqtt
+> 
+> sudo systemctl enable zwaymqtt
+> 
+> sudo systemctl start zwaymqtt
+
 ### from sources
 
 I install the software at home with the RaZberry.
