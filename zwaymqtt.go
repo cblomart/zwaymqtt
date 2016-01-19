@@ -15,7 +15,7 @@ import (
   "io/ioutil"
 
   MQTT "git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git"
-  "github.com/davecheney/profile"
+  pfl "github.com/davecheney/profile"
 )
 
 type MqttUpdate struct {
@@ -324,7 +324,7 @@ func init() {
   flag.StringVar(&mqtt_server,"m","localhost:1883","MQTT server")
   flag.IntVar(&zway_refresh,"r",30,"Z-Way refresh rate in seconds")
   flag.BoolVar(&debug,"v",false,"Show debug messages")
-  flag.StrinVar(&profile,"profile","","Profile execution (cpu/mem/all")
+  flag.StringVar(&profile,"profile","","Profile execution (cpu/mem/all")
   flag.Parse()
   //standardise hostname values to <host>:<port>
   zway_match, err := regexp.MatchString(":[0-9]+$",zway_server)
@@ -776,14 +776,14 @@ func main() {
   //start profiling
   if len(profile) > 0 {
     log.Print("Profiling enabled")
-    cfg := profile.Config{}
+    cfg := pfl.Config{}
     if profile=="mem" || profile=="all" {
-      profile.MemProfile = true
+      cfg.MemProfile = true
     }
     if profile=="cpu" || profile=="all" {
-      profile.CpuProfile = true
+      cfg.CPUProfile = true
     }
-    defer profile.Start(cfg).Stop()
+    defer pfl.Start(&cfg).Stop()
   }
   //print informations given
   log.Print("Starting Z-Way to mqtt gateway...")
