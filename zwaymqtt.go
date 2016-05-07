@@ -43,6 +43,8 @@ var zway_password string
 var zway_home string
 var zway_refresh int
 var mqtt_server string
+var mqtt_username string
+var mqtt_password string
 var debug bool
 var profile string
 
@@ -322,6 +324,8 @@ func init() {
   flag.StringVar(&zway_password,"p","","Z-Way passsword")
   flag.StringVar(&zway_home,"h","razberry","mqtt topic root")
   flag.StringVar(&mqtt_server,"m","localhost:1883","MQTT server")
+  flag.StringVar(&mqtt_username,"mu","","MQTT username")
+  flag.StringVar(&mqtt_password,"mp","","MQTT password")
   flag.IntVar(&zway_refresh,"r",30,"Z-Way refresh rate in seconds")
   flag.BoolVar(&debug,"v",false,"Show debug messages")
   flag.StringVar(&profile,"profile","","Profile execution (cpu/mem/all")
@@ -807,6 +811,10 @@ func main() {
   opts.AddBroker("tcp://"+mqtt_server)
   opts.SetClientID("ZWayMQTT")
   opts.SetDefaultPublishHandler(f)
+  if len(mqtt_username) > 0 && len(mqtt_password) > 0 {
+    opts.SetUsername(mqtt_username)
+    opts.SetPassword(mqtt_password)
+  }
 
   //Connect
   mqtt := MQTT.NewClient(opts)
