@@ -34,6 +34,6 @@ build:
 
     # Build the project
     - script:
-        name: go build
+        name: go build for rpi1
         code: |
-          go build ./...
+          GOOS=linux GOARCH=arm GOARM=5 go build -ldflags '-s' -o zwaymqtt_linux_arm5
