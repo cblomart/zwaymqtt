@@ -651,6 +651,45 @@ func zwayparsedevices(update map[string]interface{}) {
             }
           }
         }
+      case GENERIC_TYPE_THERMOSTAT:
+        //get the binary switch to enable/disable thermostat
+        nkey := fmt.Sprintf("devices.%s.instances.%s.commandClasses.%d.data",
+           node, i, COMMAND_CLASS_SWITCH_BINARY)
+        topic := fmt.Sprintf("%s/actuators/binary/%s/%s/switch",
+          zway_home, normName(givenName), i)
+        gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
+           Value: "level.value", Write:true, Type: "bool"})
+        //TODO: informations about set point
+        //get the informations about sensors
+        data, err := zwaygetcmdclassdata(commandClasses,
+          COMMAND_CLASS_SENSOR_MULTILEVEL)
+        if err == nil {
+          for k, v := range data {
+            if _, err := strconv.Atoi(k); err == nil {
+              sensor := v.(map[string]interface{})
+              sensorType, err := jsonStringValue("sensorTypeString.value",
+                sensor)
+              if err != nil {
+                log.Printf("Could not get sensor type: %s", err)
+                continue
+              }
+              sensorScale, err := jsonStringValue("scaleString.value",
+                sensor)
+              if err != nil {
+                log.Printf("Could not get sensor scale: %s", err)
+                continue
+              }
+              nkey := fmt.Sprintf(
+                "devices.%s.instances.%s.commandClasses.%d.data.%s",
+                node, i, COMMAND_CLASS_SENSOR_MULTILEVEL,k)
+              topic := fmt.Sprintf("%s/sensors/analogic/%s/%s/%s/%s",
+                zway_home, normName(givenName), i, normName(sensorType),
+                normName(sensorScale))
+              gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
+                 Value: "val.value", Write:false, Type: "float"})
+            }
+          }
+        }
       default:
         log.Printf("device not implemented: type: %d / name: %s", genericType, givenName)
       }

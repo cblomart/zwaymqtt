@@ -1,0 +1,5 @@
+.DS_Store
+#generated exe
+*.exe
+#generated linux binary
+zwaymqtt
