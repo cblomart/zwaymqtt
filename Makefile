@@ -5,6 +5,10 @@ RELEASE_DIR=releases
 SRC_FILES=$(wildcard *.go)
 BUILD_FLAGS=-ldflags '-s' -a 
 
+deps:
+	go get git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git
+	go get github.com/davecheney/profile
+
 build-windows-amd64:
 	@$(MAKE) build GOOS=windows GOARCH=amd64 SUFFIX=.exe
 
