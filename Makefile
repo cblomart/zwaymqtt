@@ -24,5 +24,5 @@ build: $(RELEASE_DIR)/$(GOOS)/$(GOARCH)/zwaymqtt$(SUFFIX)
 all:
 	@$(MAKE) build-windows-amd64 
 	@$(MAKE) build-linux-amd64
-    @$(MAKE) build-darwin-amd64
-    @$(MAKE) build-linux-arm5
+	@$(MAKE) build-darwin-amd64
+	@$(MAKE) build-linux-arm5
