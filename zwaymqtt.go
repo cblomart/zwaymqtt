@@ -533,7 +533,7 @@ func zwayparsedevices(update map[string]interface{}) {
       instance := instances[i].(map[string]interface{})
       commandClasses, err := jsonMapValue("commandClasses",instance)
       if err != nil {
-        log.Printf("commad classes not found: %s", err)
+        log.Printf("command classes not found: %s", err)
         continue
       }
       nkey := fmt.Sprintf("devices.%s.instances.%s.commandClasses.%d.data",
@@ -652,7 +652,7 @@ func zwayparsedevices(update map[string]interface{}) {
           }
         }
       default:
-        log.Print("device not implemented.")
+        log.Printf("device not implemented: type: %d / name: %s", genericType, givenName)
       }
     }
   }
