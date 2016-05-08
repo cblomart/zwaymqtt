@@ -31,11 +31,6 @@ type Gateway struct {
   Type string
 }
 
-//type MqttUpdate struct {
-//  Topic string
-//  Value string
-//}
-
 //command line variable
 var zway_server string
 var zway_username string
@@ -319,17 +314,51 @@ func (g *Gateway) GetValue(update map[string]interface{}) string {
 
 func init() {
   //initialize command line parameters
-  flag.StringVar(&zway_server,"s","localhost:8083","Z-Way server name")
-  flag.StringVar(&zway_username,"u","admin","Z-Way username")
-  flag.StringVar(&zway_password,"p","","Z-Way passsword")
-  flag.StringVar(&zway_home,"h","razberry","mqtt topic root")
-  flag.StringVar(&mqtt_server,"m","localhost:1883","MQTT server")
-  flag.StringVar(&mqtt_username,"mu","","MQTT username")
-  flag.StringVar(&mqtt_password,"mp","","MQTT password")
-  flag.IntVar(&zway_refresh,"r",30,"Z-Way refresh rate in seconds")
+  flag.StringVar(&zway_server,"s","localhost:8083","Z-Way server name or ZWAY_SERVER environment variable")
+  flag.StringVar(&zway_username,"u","admin","Z-Way username or ZWAY_USERNAME environment variable")
+  flag.StringVar(&zway_password,"p","","Z-Way passsword or ZWAY_PASSWORD environment variable")
+  flag.StringVar(&zway_home,"h","razberry","mqtt topic root or ZWAY_HOME environment variable")
+  flag.StringVar(&mqtt_server,"m","localhost:1883","MQTT server or MQTT_SERVER environment variable")
+  flag.StringVar(&mqtt_username,"mu","","MQTT username or MQTT_USERNAME environment variable")
+  flag.StringVar(&mqtt_password,"mp","","MQTT password or MQTT_PASSWORD environment variable")
+  flag.IntVar(&zway_refresh,"r",30,"Z-Way refresh rate in seconds or ZWAY_REFRESH environment variable")
   flag.BoolVar(&debug,"v",false,"Show debug messages")
-  flag.StringVar(&profile,"profile","","Profile execution (cpu/mem/all")
+  flag.StringVar(&profile,"profile","","Profile execution (cpu/mem/all)")
   flag.Parse()
+  
+  // check defaults against environment variables
+  if zway_server == "localhost:8083" && len(os.Getenv("ZWAY_SERVER")) > 0 {
+      zway_server = os.Getenv("ZWAY_SERVER")
+  }
+  
+  if zway_username == "admin" && len(os.Getenv("ZWAY_USERNAME")) > 0 {
+      zway_username = os.Getenv("ZWAY_USERNAME")
+  }
+  
+  if len(zway_password) == 0 && len(os.Getenv("ZWAY_PASSWORD")) > 0 {
+      zway_password = os.Getenv("ZWAY_PASSWORD")
+  }
+  
+  if zway_home == "razberry" && len(os.Getenv("ZWAY_HOME")) > 0 {
+      zway_home = os.Getenv("ZWAY_HOME")
+  }
+  
+  if zway_refresh == 30 && len(os.Getenv("ZWAY_REFRESH")) > 0 {
+      zway_refresh, _ = strconv.Atoi(os.Getenv("ZWAY_REFRESH"))
+  }
+  
+  if mqtt_server == "localhost:1883" && len(os.Getenv("MQTT_SERVER")) > 0 {
+      mqtt_server = os.Getenv("MQTT_SERVER")
+  }
+  
+  if len(mqtt_username) == 0 && len(os.Getenv("MQTT_USERNAME")) > 0 {
+      mqtt_username = os.Getenv("MQTT_USERNAME")
+  }
+  
+  if len(mqtt_password) == 0 && len(os.Getenv("MQTT_PASSWORD")) > 0 {
+      mqtt_password = os.Getenv("MQTT_PASSWORD")
+  }  
+  
   //standardise hostname values to <host>:<port>
   zway_match, err := regexp.MatchString(":[0-9]+$",zway_server)
   if err != nil {

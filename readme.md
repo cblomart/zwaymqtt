@@ -23,6 +23,31 @@ The instance is always used. (i)
 
 Currently the bridge is limited to certain ZWave classes (see bellow).
 
+# Usage
+
+> Usage of zwaymqtt:
+>   -h string
+>     	mqtt topic root or ZWAY_HOME environment variable (default "razberry")
+>   -m string
+>     	MQTT server or MQTT_SERVER environment variable (default "localhost:1883")
+>   -mp string
+>     	MQTT password or MQTT_PASSWORD environment variable
+>   -mu string
+>     	MQTT username or MQTT_USERNAME environment variable
+>   -p string
+>     	Z-Way passsword or ZWAY_PASSWORD environment variable
+>   -profile string
+>     	Profile execution (cpu/mem/all)
+>   -r int
+>     	Z-Way refresh rate in seconds or ZWAY_REFRESH environment variable (default 30)
+>   -s string
+>     	Z-Way server name or ZWAY_SERVER environment variable (default "localhost:8083")
+>   -u string
+>     	Z-Way username or ZWAY_USERNAME environment variable (default "admin")
+>   -v	Show debug messages
+
+notice that main parameters are mapped by an environment variable
+
 ## Instalation
 
 ### from release
