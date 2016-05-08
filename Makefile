@@ -12,17 +12,34 @@ deps:
 build-windows-amd64:
 	@$(MAKE) build GOOS=windows GOARCH=amd64 SUFFIX=.exe
 
+dist-windows-amd64:
+	@$(MAKE) dist GOOS=windows GOARCH=amd64 SUFFIX=.exe
+
 build-linux-amd64:
 	@$(MAKE) build GOOS=linux GOARCH=amd64
 
+dist-linux-amd64:
+	@$(MAKE) dist GOOS=linux GOARCH=amd64
+
 build-darwin-amd64:
 	@$(MAKE) build GOOS=darwin GOARCH=amd64
+
+dist-darwin-amd64:
+	@$(MAKE) dist GOOS=darwin GOARCH=amd64
     
-build-linux-arm5:
+build-linux-arm:
 	@$(MAKE) build GOOS=linux GOARCH=arm GOARM=5
+
+dist-linux-arm:
+	@$(MAKE) dist GOOS=linux GOARCH=arm GOARM=5
 
 $(RELEASE_DIR)/$(GOOS)/$(GOARCH)/zwaymqtt$(SUFFIX): $(SRC_FILES)
 	go build $(BUILD_FLAGS) -o $(RELEASE_DIR)/$(GOOS)/$(GOARCH)/zwaymqtt$(SUFFIX) .
+
+$(RELEASE_DIR)/zwaymqtt_$(GOOS)_$(GOARCH).zip: $(RELEASE_DIR)/$(GOOS)/$(GOARCH)/zwaymqtt$(SUFFIX)
+	cd $(RELEASE_DIR)/$(GOOS)/$(GOARCH); zip -r ../../zwaymqtt_$(GOOS)_$(GOARCH).zip ./zwaymqtt$(SUFFIX)
+
+dist: $(RELEASE_DIR)/zwaymqtt_$(GOOS)_$(GOARCH).zip
 
 build: $(RELEASE_DIR)/$(GOOS)/$(GOARCH)/zwaymqtt$(SUFFIX)
 
@@ -30,7 +47,7 @@ clean:
 	rm -rf $(RELEASE_DIR)
 
 all:
-	@$(MAKE) build-windows-amd64 
-	@$(MAKE) build-linux-amd64
-	@$(MAKE) build-darwin-amd64
-	@$(MAKE) build-linux-arm5
+	@$(MAKE) dist-windows-amd64 
+	@$(MAKE) dist-linux-amd64
+	@$(MAKE) dist-darwin-amd64
+	@$(MAKE) dist-linux-arm

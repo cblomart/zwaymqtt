@@ -5,6 +5,8 @@ A simple Z-Way to MQTT bridge in GO.
 
 [![Build Status](https://drone.io/github.com/cblomart/zwaymqtt/status.png)](https://drone.io/github.com/cblomart/zwaymqtt/latest)
 
+[![Build Status](https://travis-ci.org/cblomart/zwaymqtt.svg?branch=master)](https://travis-ci.org/cblomart/zwaymqtt)
+
 [Latest binaries](https://drone.io/github.com/cblomart/zwaymqtt/files)
 
 The service sends MQTT message for all handled classes to the a MQTT broker.

@@ -1,5 +1,9 @@
 .DS_Store
-#generated exe
+# generated exe
 *.exe
-#generated linux binary
+# generated linux binary
 zwaymqtt
+# generated release
+releases
+# generated zip
+*.zip
