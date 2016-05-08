@@ -26,14 +26,65 @@ build:
     # at the right place in the workspace tree
     - setup-go-workspace
 
+    - install-packages:
+         packages: zip
+
     # Gets the dependencies
     - script:
         name: go get
         code: |
           go get
 
-    # Build the project
+    # Build the project 
     - script:
         name: go build for rpi1
         code: |
-          GOOS=linux GOARCH=arm GOARM=5 go build -ldflags '-s' -o zwaymqtt_linux_arm5
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 go build -a -ldflags '-s' -o zwaymqtt_linux_arm5
+          
+    # Build the project 
+    - script:
+        name: go build for linux
+        code: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-s' -o zwaymqtt_linux_amd64
+          
+    # Build the project 
+    - script:
+        name: go build for mac os x
+        code: |
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -a -ldflags '-s' -o zwaymqtt_osx_amd64
+          
+    # Build the project 
+    - script:
+        name: go build for windows
+        code: |
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -a -ldflags '-s' -o zwaymqtt_win_amd64.exe
+
+    # Create the dist directory
+    - script:
+        name: create dist dir
+        code: |
+          mkdir -p $WERCKER_OUTPUT_DIR/dist
+
+    # zip the generated binaries
+    - script:
+        name: create zip package for rpi1
+        code: |
+          zip -r $WERCKER_OUTPUT_DIR/dist/zwaymqtt_linux_arm5.zip zwaymqtt_linux_arm5
+
+    # zip the generated binaries
+    - script:
+        name: create zip package for linux
+        code: |
+          zip -r $WERCKER_OUTPUT_DIR/dist/zwaymqtt_linux_amd64.zip zwaymqtt_linux_amd64
+          
+    # zip the generated binaries
+    - script:
+        name: create zip package for os x
+        code: |
+          zip -r $WERCKER_OUTPUT_DIR/dist/zwaymqtt_osx_amd64.zip zwaymqtt_osx_amd64
+
+    # zip the generated binaries
+    - script:
+        name: create zip package for windows
+        code: |
+          zip -r $WERCKER_OUTPUT_DIR/dist/zwaymqtt_win_amd64.zip zwaymqtt_win_amd64.exe
