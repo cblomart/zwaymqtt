@@ -88,3 +88,11 @@ build:
         name: create zip package for windows
         code: |
           zip -r $WERCKER_OUTPUT_DIR/dist/zwaymqtt_win_amd64.zip zwaymqtt_win_amd64.exe
+          
+deploy:
+ steps:
+   - tcnksm/ghr:
+     token: $GITHUB_TOKEN
+     input: $WERCKER_OUTPUT_DIR/dist
+     version: latest
+     replace: true
