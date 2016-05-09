@@ -908,7 +908,7 @@ func main() {
   //create the zway refresh timer
   refreshes := time.NewTicker(time.Second * time.Duration(zway_refresh)).C
 
-  //maque initial refreshe
+  //make initial refreshe
   zway_updates <- getzway()
 
   //subscribe only when zway started

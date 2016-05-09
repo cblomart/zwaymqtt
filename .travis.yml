@@ -1,7 +1,15 @@
 language: go
 go:
 - tip
-sudo: false
+sudo: required
+env:
+  global:
+  - secure: kdfOrgrJ+3oIloEsqOAuRwKY4m/ql27Qsy3UrKAxs1Kkr8pt6RdLI5Nop0WWDy0gEe5OLLQXVOmEZN/j23d2T7gK3KbYrVzVZHviPZJ0QAdB1jZBAtS5m9Inib7H349ZiZMpOG6nupWODdvzjJq/PYiAlGclNfXPZvokKWImTGTgQwnzEZVJ36rpX4kVd4dFhRssCI29HM+nOpt5ub8U4M4jKQAYSGEB+AC6tQdoe58rD9SuFcvXHENJQ/FSE9YCi94uDChbYeK1nCz55ddnODdl209a+fuzOtlqBh+pZ9l1FAFaO4ug5zA0hbIARES/utBzDTueClwx2uSBMcfrR3JJpVZJ5kLWozqUEC3AjKgyVDe2Y0OiXcQItx2Niaon6QA3igc8UQGYgUA9g2WtAxduhqo9A/fObZ3tvgB8cXjQN/UNtfROgKaunldGlLOiSRUMu8Dq/6ZoHBt9U1y+dQ5BbEheSwcdJTEnwNxyPXn8x0Dk2D+PY8FO//czXWaHmQaXDBLEHRIczmDv3NDqGRVax1j6+uVcXnc7LOCmc68cxMECDZQdNYzAJFdsD0DXpPJkCIwrfxQjHrsW169kBbGT8PI5y/LeEyyhVrrO4WtCz3cSH4xvf+FE7t0JjU+imySu2USpeYmY5MxF3LBAPUPOA2a93VUBpz8vWstpSVQ=
+  - secure: ngOeyJvRriJhR1XUj5hcS508AeuYN+xaBRvBgL/7hcGWRpdLOi9Uh4i2jsqhGdxca3ErSwLuLxTrJTpjGn4FtzdgAtW4e2wlsgId0Y3RQiX1ZPBV3nbxCKZ0DMczO8GJycp+ZK4TJExhDbsKDBPjD7mh+k4Ah9EcT8J7xstE5CR09oIzhX0VqRAgKvRIXncyhMbC5fKBN9Z2FEhb7HsHv46u7KbXN2fzyl4CvOMX0CsukjtvxQzEQ+WB7l2hGtg9jhyMCNDxWIHc0SQa8NVOPKKVvDfj3cdE4WEZOmzgie8bahO18wTr7I8Hyzf6KzVl2fGzeoa/tG41gbr9CdiN8J5IJKc0W7W5lFGnfnYuXnQNdM3S3lqO9ATV6fbLOlDnXKTwJGycLUJBtaX1uTGfD1ENl2PEL16WUrxaVjBS3vqoeQ6ToQngBXY809j5pyEjX+2am77Zr2bYTGme4VL1O0QVDspA7Nx+J2YNNAVtxfmqEORIjhflO8xu7jXckrG1p18duwjc+975YrCF+dHXKe47sw16auMt7YLu1W1yHKt71+Mpo5/Hrl5+ZC74MOeTpxjLhQy+8jI4s0+SqPtDBMhR1Y8Na+a4fgihI2iYAQw6rLnh9pTFXfoLRYMwfEgz2krvNg+zY7KtMbBDr82o8CMBHp9OQmi12ft/npuF4oQ=
+  - secure: bgQnUHuTEmm3wL7UImuOOAk+ox5wGu94rJQ8zLEJOxKtLpJWI0p0pHRJqgeh/cPOO/GvtXy++aDwSgXobJO+8WyaM6+oZ394cSOQlC2Jn4ewup4PpOZFqxEFeKU9fWIp6GfyrUpYufh6DIgL4hufmeuUF91tDDrKtfhgLX8M+UbFztdPtzU2qvfmc/3pT8kDpqRzZahtMYjuN9TZ8xAG1rNDWbYokiBhHxK5P1/5qJqWE5tXZ511H4lGQJzFX6aaMqn7fpIj8hDpeaDWNoko2T9FSTrIUKweRtXvJUj2vzJXjxSX0MPoLhLnsE9q8dlOG2k3sd2Yxe2NYy1y6bWGEN66ScA/fzyKYjApr+A1IEUmML7g9i36wzQsdV5IWhgiuPwtRh6+EDGIeTg3jK4R7XrVeN/ppsz0Bdjx0vtCDH7vyMsRkGF1vtj3N4vKlmxcPBRRh63zex/c45d+MLvTO84vIh3YTd2LLY0Jo5K7wO7oczAh06wz3yNtF6m2Tawf3FtYXet6UUoQONxrdRUD1Rm/Woek/SeUb3ip0dSpb2mOa1hw2A/irE6GwSlTgLwYyfZAcCSb+MEaUOPyEpuSeILq1/o9YgtSbgXlh2VD31gptanN6tZ8zZtk0P14USdSEmsLuNB5g0NCI4VZr//xU74Nq2kqdf30Z3hxEGhl7DE=
+  - COMMIT=${TRAVIS_COMMIT::8}
+services:
+- docker
 install:
 - make deps
 script:
@@ -17,4 +25,14 @@ deploy:
   - releases/zwaymqtt_windows_amd64.tgz
   skip_cleanup: true
   on:
-    tags: true
+    tags: true 
+after_success:
+- docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+- docker build -f docker/linux/Dockerfile -t $DOCKER_USERNAME/zwaymqtt:$COMMIT
+- if [! -z "$TRAVIS_TAG" ]; then docker tag $DOCKER_USERNAME/zwaymqtt:$TRAVIS_TAG; fi
+- if [! -z "$TRAVIS_TAG" ]; then docker tag $DOCKER_USERNAME/zwaymqtt:latest; fi
+- docker push $DOCKER_USERNAME/zwaymqtt
+- docker build -f docker/rpi/Dockerfile -t $DOCKER_USERNAME/rpi-zwaymqtt:$COMMIT
+- if [! -z "$TRAVIS_TAG" ]; then docker tag $DOCKER_USERNAME/rpi-zwaymqtt:$TRAVIS_TAG; fi
+- if [! -z "$TRAVIS_TAG" ]; then docker tag $DOCKER_USERNAME/rpi-zwaymqtt:latest; fi
+- docker push $DOCKER_USERNAME/rpi-zwaymqtt

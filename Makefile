@@ -45,7 +45,7 @@ build: $(RELEASE_DIR)/$(GOOS)/$(GOARCH)/zwaymqtt$(SUFFIX)
 
 clean:
 	rm -rf $(RELEASE_DIR)
-
+	
 all:
 	@$(MAKE) dist-windows-amd64 
 	@$(MAKE) dist-linux-amd64
