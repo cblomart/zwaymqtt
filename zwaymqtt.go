@@ -322,7 +322,7 @@ func init() {
   flag.StringVar(&mqtt_server,"m","localhost:1883","MQTT server or MQTT_SERVER environment variable")
   flag.StringVar(&mqtt_username,"mu","","MQTT username or MQTT_USERNAME environment variable")
   flag.StringVar(&mqtt_password,"mp","","MQTT password or MQTT_PASSWORD environment variable")
-  flag.StringVar(&mqtt_protocol,"proto","tcp","MQTT protocol tcp/ws/tls")
+  flag.StringVar(&mqtt_protocol,"proto","tcp","MQTT protocol tcp/ws/tls or MQTT_PROTOCOL environment variable")
   flag.IntVar(&zway_refresh,"r",30,"Z-Way refresh rate in seconds or ZWAY_REFRESH environment variable")
   flag.BoolVar(&debug,"v",false,"Show debug messages")
   flag.StringVar(&profile,"profile","","Profile execution (cpu/mem/all)")
@@ -360,6 +360,10 @@ func init() {
   if len(mqtt_password) == 0 && len(os.Getenv("MQTT_PASSWORD")) > 0 {
       mqtt_password = os.Getenv("MQTT_PASSWORD")
   }  
+  
+  if mqtt_protocol == "tcp" && len(os.Getenv("MQTT_PROTOCOL")) > 0 {
+    mqtt_protocol = os.Getenv("MQTT_PROTOCOL")
+  }
   
   //standardise hostname values to <host>:<port>
   zway_match, err := regexp.MatchString(":[0-9]+$",zway_server)

@@ -38,6 +38,8 @@ Currently the bridge is limited to certain ZWave classes (see bellow).
 >     	Z-Way passsword or ZWAY_PASSWORD environment variable
 >   -profile string
 >     	Profile execution (cpu/mem/all)
+>   -proto string
+>       MQTT protocol tcp/ws/tls MQTT protocol tcp/ws/tls or MQTT_PROTOCOL environment variable (default "tcp")
 >   -r int
 >     	Z-Way refresh rate in seconds or ZWAY_REFRESH environment variable (default 30)
 >   -s string
@@ -47,6 +49,23 @@ Currently the bridge is limited to certain ZWave classes (see bellow).
 >   -v	Show debug messages
 
 notice that main parameters are mapped by an environment variable
+
+# Docker
+
+All builds are pushed to docker:
+  - [cblomart/zwaymqtt](https://hub.docker.com/r/cblomart/zwaymqtt/)
+  - [cblomart/rpi-zwaymqtt](https://hub.docker.com/r/cblomart/rpi-zwaymqtt/)
+  
+Please use environment variables to configure:
+  - MQTT topic root = ZWAY_HOME
+  - MQTT server = MQTT_SERVER
+  - MQTT password = MQTT_PASSWORD
+  - MQTT username = MQTT_USERNAME
+  - MQTT protocol = MQTT_PROTOCOL
+  - Z-Way server name = ZWAY_SERVER
+  - Z-Way username = ZWAY_USERNAME
+  - Z-Way password = ZWAY_PASSWORD
+  - Z-Way refresh rate = ZWAY_REFRESH
 
 ## Instalation
 
