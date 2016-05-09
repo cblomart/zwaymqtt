@@ -28,10 +28,12 @@ deploy:
     tags: true 
 after_success:
 - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+- cp releases/linux/amd64/zwaymqtt docker/linux/
 - docker build -f docker/linux/Dockerfile -t $DOCKER_USERNAME/zwaymqtt:$COMMIT docker/linux/
 - if [ ! -z "$TRAVIS_TAG" ]; then docker tag $DOCKER_USERNAME/zwaymqtt:$TRAVIS_TAG; fi
 - if [ ! -z "$TRAVIS_TAG" ]; then docker tag $DOCKER_USERNAME/zwaymqtt:latest; fi
 - docker push $DOCKER_USERNAME/zwaymqtt
+- cp releases/linux/arm/zwaymqtt docker/rpi/
 - docker build -f docker/rpi/Dockerfile -t $DOCKER_USERNAME/rpi-zwaymqtt:$COMMIT docker/rpi/
 - if [ ! -z "$TRAVIS_TAG" ]; then docker tag $DOCKER_USERNAME/rpi-zwaymqtt:$TRAVIS_TAG; fi
 - if [ ! -z "$TRAVIS_TAG" ]; then docker tag $DOCKER_USERNAME/rpi-zwaymqtt:latest; fi
