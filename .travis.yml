@@ -11,10 +11,10 @@ deploy:
   api_key:
     secure: EIFGuItbdzBxaI/Tu05MMVE1/ct5nCossfveSc4qH1I+UqXWzxh6S9w5SsNw1VUlQOByp5qfMf+Ihbvzf2xc0qEhaJZh/YiERHug8E8IWRAC2xdFOcwZyax9TjjUM7xiWJr4CTEGwikmcTtdUMyvA/Ur3m5184uR2Nm+50dgcq+dSprFDbJuFl3Pc/W6gHkSprE09k/8spAkpK2p0CmD5S6Bb4vMrGON9FiD8I4yRqqpt8lpDDnSbjy/y40ie26m471+pmAWHfa9ohGrmHQcaP6yuXC9A6wlmTvyQeO8IYZqVJyyatOHQZMUbBUDCxtTwcaCgmumq7kb4ECbKnrRHyu+J+YpPxot8iNaEmSCg+P5pogSdmQRvsl4XjV5fyzfSbfYOygO7z6JSZgLkIPquptQMdpyQ6ACFUc+CTkH7bf2sBltSJHoPevgSII2CFfeGSjcq8wEXEwKh6uJrF+pyKPsgXWBPqZ+Xy4P8jyYfCW/FWc2Wjg+Ue92ai/YNwvsobNzktqyfkivwFikJHhhnub2gNvm2AhLmKuQh4j9zZEyCUyjceedmj9cCERXEFH50MjAqBO/PstDk1TTOupOepd+dCJ8t3zLnAhg1bxQkn/ISxI553tltKewJfp1jTkdbV7EBeymhqQ4rLYY3/w89amsYo+ACX05IJy0Y1Ehu/w=
   file:
-  - releases/zwaymqtt_darwin_amd64.zip
-  - releases/zwaymqtt_linux_amd64.zip
-  - releases/zwaymqtt_linux_arm.zip
-  - releases/zwaymqtt_windows_amd64.zip
+  - releases/zwaymqtt_darwin_amd64.tgz
+  - releases/zwaymqtt_linux_amd64.tgz
+  - releases/zwaymqtt_linux_arm.tgz
+  - releases/zwaymqtt_windows_amd64.tgz
   skip_cleanup: true
   on:
     tags: true

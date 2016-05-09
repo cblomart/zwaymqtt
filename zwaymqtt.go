@@ -40,6 +40,7 @@ var zway_refresh int
 var mqtt_server string
 var mqtt_username string
 var mqtt_password string
+var mqtt_protocol string
 var debug bool
 var profile string
 
@@ -321,6 +322,7 @@ func init() {
   flag.StringVar(&mqtt_server,"m","localhost:1883","MQTT server or MQTT_SERVER environment variable")
   flag.StringVar(&mqtt_username,"mu","","MQTT username or MQTT_USERNAME environment variable")
   flag.StringVar(&mqtt_password,"mp","","MQTT password or MQTT_PASSWORD environment variable")
+  flag.StringVar(&mqtt_protocol,"proto","tcp","MQTT protocol tcp/ws/tls")
   flag.IntVar(&zway_refresh,"r",30,"Z-Way refresh rate in seconds or ZWAY_REFRESH environment variable")
   flag.BoolVar(&debug,"v",false,"Show debug messages")
   flag.StringVar(&profile,"profile","","Profile execution (cpu/mem/all)")
@@ -876,9 +878,10 @@ func main() {
   //connect and subscribe to mqtt
   //prepare
   opts := MQTT.NewClientOptions()
-  opts.AddBroker("tcp://"+mqtt_server)
+  opts.AddBroker(mqtt_protocol+"://"+mqtt_server)
   opts.SetClientID("ZWayMQTT")
   opts.SetDefaultPublishHandler(f)
+  opts.SetAutoReconnect(true)
   if len(mqtt_username) > 0 && len(mqtt_password) > 0 {
     opts.SetUsername(mqtt_username)
     opts.SetPassword(mqtt_password)
@@ -946,7 +949,7 @@ func main() {
   //star mqtt updating
   go func() {
     for mqtt_update := range mqtt_updates {
-      token := mqtt.Publish(mqtt_update.Topic, 1, false, mqtt_update.Value)
+      token := mqtt.Publish(mqtt_update.Topic, 1, true, mqtt_update.Value)
       token.Wait()
     }
   }()
