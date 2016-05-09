@@ -695,8 +695,36 @@ func zwayparsedevices(update map[string]interface{}) {
         gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
            Value: "level.value", Write:true, Type: "bool"})
         //TODO: informations about set point
-        //get the informations about sensors
         data, err := zwaygetcmdclassdata(commandClasses,
+          COMMAND_CLASS_THERMOSTAT_SET_POINT)
+        if err == nil {
+          for k, v := range data {
+            if _, err := strconv.Atoi(k); err == nil {
+              setpoint :=  v.(map[string]interface{})
+              setpointType, err := jsonStringValue("modeName.value",
+                setpoint)
+              if err != nil {
+                log.Printf("Could not get set point mode: %s", err)
+                continue
+              }
+              setpointScale, err := jsonStringValue("scaleString.value",
+                setpoint)
+              if err != nil {
+                log.Printf("Could not get setpoint scale: %s", err)
+                continue
+              }
+              nkey := fmt.Sprintf(
+                "devices.%s.instances.%s.commandClasses.%d.data.%s",
+                node, i, COMMAND_CLASS_THERMOSTAT_SET_POINT,k)
+              topic := fmt.Sprintf("%s/setpoint/analogic/%s/%s/%s/%s",
+                zway_home, normName(givenName), i, normName(setpointType),
+                normName(setpointScale))
+              gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
+                 Value: "val.value", Write:true, Type: "float"})
+            }
+          }
+        }
+        data, err = zwaygetcmdclassdata(commandClasses,
           COMMAND_CLASS_SENSOR_MULTILEVEL)
         if err == nil {
           for k, v := range data {

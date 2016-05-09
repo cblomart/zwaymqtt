@@ -185,7 +185,15 @@ The events on this class will be mapped to the "\<root\_topic\>/sensors/binary/\
 
 i.e.: razberry/sensors/analogic/detector_entry/0/temperature/c
 
- License
+### Thermostat
+
+Encompassed classes:
+
+- COMMAND\_CLASS\_THERMOSTAT\_SET\_POINT (rw)
+
+Todo: more desctiption ;-)
+
+# License
 
 The MIT License (MIT)
 
