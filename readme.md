@@ -55,7 +55,11 @@ notice that main parameters are mapped by an environment variable
 All builds are pushed to docker:
   - [cblomart/zwaymqtt](https://hub.docker.com/r/cblomart/zwaymqtt/)
   - [cblomart/rpi-zwaymqtt](https://hub.docker.com/r/cblomart/rpi-zwaymqtt/)
-  
+
+Default tags includes:
+  - branch (i.e.: master) for latest commit in the branch
+  - latest for latest release
+
 Please use environment variables to configure:
   - MQTT topic root = ZWAY_HOME
   - MQTT server = MQTT_SERVER
