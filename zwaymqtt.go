@@ -304,7 +304,7 @@ func (g *Gateway) GetValue(update map[string]interface{}) string {
     if err == nil {
       v := fmt.Sprintf("%.3f", value)
       if strings.Contains(v,".") {
-        v = strings.TrimRight(v,"0")
+        v = strings.TrimRight(v,"0.")
       }
       return v
     }
@@ -838,6 +838,29 @@ func (g *Gateway) Set(value string) {
   if g.Get() == value {
     if (debug) { log.Printf("MQTT: %s / Value not changed", g.ToString()) }
     return
+  }
+  //check value
+  switch g.Type {
+    case "int":
+      if strings.Contains(value,".") {
+        value = strings.TrimRight(value,"0.")
+      }
+      i, err := strconv.Atoi(value)
+      if err != nil {
+        log.Printf("MQTT: %s / value not int: %s", g.ToString(), value)
+        return
+      }
+      value = fmt.Sprintf("%d",i)
+    case "float":
+      if strings.Contains(value,".") {
+        value = strings.TrimRight(value,"0.")
+      }
+      f, err := strconv.ParseFloat(value,64)
+      if err != nil {
+        log.Printf("MQTT: %s / value not float: %s", g.ToString(), value)
+        return
+      }
+      value = fmt.Sprintf("%.3f", f)
   }
   log.Printf("MQTT: %s / Value: %s ", g.ToString(), value)
   key := g.Key
