@@ -1,4 +1,5 @@
 FROM scratch
 MAINTAINER cblomart@gmail.com
-COPY ./zwaymqtt /bin/zwaymqtt
-ENTRYPOINT ["/bin/zwaymqtt"]
+WORKDIR /
+COPY ./zwaymqtt /zwaymqtt
+ENTRYPOINT ["/zwaymqtt"]
