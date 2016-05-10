@@ -30,6 +30,7 @@ after_success:
 - echo branch $TRAVIS_BRANCH / tag $TRAVIS_TAG / commit $COMMIT
 - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 - cp releases/linux/amd64/zwaymqtt docker/linux/
+- cp docker/ca-certificates.crt docker/linux/
 - docker build -f docker/linux/Dockerfile -t $DOCKER_USERNAME/zwaymqtt docker/linux/
 - docker tag -f $DOCKER_USERNAME/zwaymqtt $DOCKER_USERNAME/zwaymqtt:$COMMIT
 - docker tag -f $DOCKER_USERNAME/zwaymqtt $DOCKER_USERNAME/zwaymqtt:$TRAVIS_BRANCH
@@ -37,6 +38,7 @@ after_success:
 - if [ "$TRAVIS_TAG" != "" ]; then docker tag -f $DOCKER_USERNAME/zwaymqtt $DOCKER_USERNAME/zwaymqtt:stable; fi
 - docker push $DOCKER_USERNAME/zwaymqtt
 - cp releases/linux/arm/zwaymqtt docker/rpi/
+- cp docker/ca-certificates.crt docker/rpi/
 - docker build -f docker/rpi/Dockerfile -t $DOCKER_USERNAME/rpi-zwaymqtt docker/rpi/
 - docker tag -f $DOCKER_USERNAME/rpi-zwaymqtt $DOCKER_USERNAME/rpi-zwaymqtt:$COMMIT
 - docker tag -f $DOCKER_USERNAME/rpi-zwaymqtt $DOCKER_USERNAME/rpi-zwaymqtt:$TRAVIS_BRANCH
