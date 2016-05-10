@@ -943,7 +943,7 @@ func main() {
   zway_updates <- getzway()
 
   //subscribe only when zway started
-  subject := "/" + zway_home + "/actuators/#"
+  subject := zway_home + "/actuators/#"
   if token := mqtt.Subscribe(subject, 1, nil); token.Wait() && token.Error() != nil {
     fmt.Println(token.Error())
     os.Exit(1)
