@@ -302,7 +302,11 @@ func (g *Gateway) GetValue(update map[string]interface{}) string {
   case "float":
     value, err := jsonFloatValue(g.Key + "." + g.Value,update)
     if err == nil {
-      return fmt.Sprintf("%.3g", value)
+      v := fmt.Sprintf("%.3f", value)
+      if strings.Contains(v,".") {
+        v = strings.TrimRight(v,"0")
+      }
+      return v
     }
   case "bool":
     value, err := jsonBoolValue(g.Key + "." + g.Value,update)
@@ -754,7 +758,7 @@ func zwayparsedevices(update map[string]interface{}) {
           }
         }
       default:
-        log.Printf("device not implemented: type: %d / name: %s", genericType, givenName)
+        log.Printf("device not implemented: type: %f / name: %s", genericType, givenName)
       }
     }
   }
