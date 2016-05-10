@@ -10,6 +10,10 @@ env:
   - COMMIT=${TRAVIS_COMMIT::8}
 services:
 - docker
+addons:
+  apt:
+    packages:
+    - upx-ucl
 install:
 - make deps
 script:
@@ -30,18 +34,16 @@ after_success:
 - echo branch $TRAVIS_BRANCH / tag $TRAVIS_TAG / commit $COMMIT
 - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 - cp releases/linux/amd64/zwaymqtt docker/linux/
-- chmod +x docker/linux/zwaymqtt
 - docker build -f docker/linux/Dockerfile -t $DOCKER_USERNAME/zwaymqtt docker/linux/
 - docker tag -f $DOCKER_USERNAME/zwaymqtt $DOCKER_USERNAME/zwaymqtt:$COMMIT
 - docker tag -f $DOCKER_USERNAME/zwaymqtt $DOCKER_USERNAME/zwaymqtt:$TRAVIS_BRANCH
 - if [ "$TRAVIS_TAG" != "" ]; then docker tag -f $DOCKER_USERNAME/zwaymqtt $DOCKER_USERNAME/zwaymqtt:$TRAVIS_TAG; fi
-- if [ "$TRAVIS_TAG" != "" ]; then docker tag -f $DOCKER_USERNAME/zwaymqtt $DOCKER_USERNAME/zwaymqtt:latest; fi
+- if [ "$TRAVIS_TAG" != "" ]; then docker tag -f $DOCKER_USERNAME/zwaymqtt $DOCKER_USERNAME/zwaymqtt:stable; fi
 - docker push $DOCKER_USERNAME/zwaymqtt
 - cp releases/linux/arm/zwaymqtt docker/rpi/
-- chmod +x docker/rpi/zwaymqtt
 - docker build -f docker/rpi/Dockerfile -t $DOCKER_USERNAME/rpi-zwaymqtt docker/rpi/
 - docker tag -f $DOCKER_USERNAME/rpi-zwaymqtt $DOCKER_USERNAME/rpi-zwaymqtt:$COMMIT
 - docker tag -f $DOCKER_USERNAME/rpi-zwaymqtt $DOCKER_USERNAME/rpi-zwaymqtt:$TRAVIS_BRANCH
 - if [ "$TRAVIS_TAG" != "" ]; then docker tag -f $DOCKER_USERNAME/rpi-zwaymqtt $DOCKER_USERNAME/rpi-zwaymqtt:$TRAVIS_TAG; fi
-- if [ "$TRAVIS_TAG" != "" ]; then docker tag -f $DOCKER_USERNAME/rpi-zwaymqtt $DOCKER_USERNAME/rpi-zwaymqtt:latest; fi
+- if [ "$TRAVIS_TAG" != "" ]; then docker tag -f $DOCKER_USERNAME/rpi-zwaymqtt $DOCKER_USERNAME/rpi-zwaymqtt:stable; fi
 - docker push $DOCKER_USERNAME/rpi-zwaymqtt
