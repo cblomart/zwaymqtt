@@ -980,7 +980,7 @@ func main() {
   //star mqtt updating
   go func() {
     for mqtt_update := range mqtt_updates {
-      token := mqtt.Publish(mqtt_update.Topic, 1, true, mqtt_update.Value)
+      token := mqtt.Publish(mqtt_update.Topic, 1, false, mqtt_update.Value)
       token.Wait()
     }
   }()
