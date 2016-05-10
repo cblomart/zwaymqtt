@@ -724,7 +724,7 @@ func zwayparsedevices(update map[string]interface{}) {
                 zway_home, normName(givenName), i, normName(setpointType),
                 normName(setpointScale))
               gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-                 Value: "setVal.value", Write:true, Type: "float"})
+                 Value: "val.value", Write:true, Type: "int"})
             }
           }
         }
