@@ -35,7 +35,6 @@ dist-linux-arm:
 
 $(RELEASE_DIR)/$(GOOS)/$(GOARCH)/zwaymqtt$(SUFFIX): $(SRC_FILES)
 	go build $(BUILD_FLAGS) -o $(RELEASE_DIR)/$(GOOS)/$(GOARCH)/zwaymqtt$(SUFFIX) .
-	upx --brute $(RELEASE_DIR)/$(GOOS)/$(GOARCH)/zwaymqtt$(SUFFIX)
 
 $(RELEASE_DIR)/zwaymqtt_$(GOOS)_$(GOARCH).tgz: $(RELEASE_DIR)/$(GOOS)/$(GOARCH)/zwaymqtt$(SUFFIX)
 	cd $(RELEASE_DIR)/$(GOOS)/$(GOARCH); tar czf ../../zwaymqtt_$(GOOS)_$(GOARCH).tgz ./zwaymqtt$(SUFFIX)

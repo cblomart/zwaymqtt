@@ -826,17 +826,20 @@ var f MQTT.MessageHandler = func(client *MQTT.Client, msg MQTT.Message) {
   topic := msg.Topic()
   value := string(msg.Payload())
   for _, g := range gateways {
-    if g.Topic == topic {
-      if g.Get() != value {
-        log.Printf("MQTT: %s / Value: %s ", g.ToString(), value )
-        g.Set(value)
-      }
-    }
+    if g.Topic == topic { g.Set(value) }
   }
 }
 
 func (g *Gateway) Set(value string) {
-  if (debug) { log.Print("Setting Z-Way value.") }
+  if !g.Write {
+    if (debug) { log.Printf("MQTT: %s / Readonly", g.ToString()) }
+    return
+  }
+  if g.Get() == value {
+    if (debug) { log.Printf("MQTT: %s / Value not changed", g.ToString()) }
+    return
+  }
+  log.Printf("MQTT: %s / Value: %s ", g.ToString(), value)
   key := g.Key
   r := regexp.MustCompile("\\.([0-9]+)\\.")
   key = r.ReplaceAllString(key, "[$1].")

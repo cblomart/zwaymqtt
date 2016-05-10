@@ -10,10 +10,6 @@ env:
   - COMMIT=${TRAVIS_COMMIT::8}
 services:
 - docker
-addons:
-  apt:
-    packages:
-    - upx-ucl
 install:
 - make deps
 script:
