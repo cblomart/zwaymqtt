@@ -716,7 +716,7 @@ func zwayparsedevices(update map[string]interface{}) {
               nkey := fmt.Sprintf(
                 "devices.%s.instances.%s.commandClasses.%d.data.%s",
                 node, i, COMMAND_CLASS_THERMOSTAT_SET_POINT,k)
-              topic := fmt.Sprintf("%s/setpoint/analogic/%s/%s/%s/%s",
+              topic := fmt.Sprintf("%s/actuators/analogic/%s/%s/%s/%s",
                 zway_home, normName(givenName), i, normName(setpointType),
                 normName(setpointScale))
               gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
@@ -805,9 +805,8 @@ func checkzwayupdate(update string,mqtt_updates chan<- MqttUpdate) {
     if err != nil {
       log.Printf("devices not found: %s", err)
       return
-    } else {
-      zwayparsedevices(devices)
     }
+    zwayparsedevices(devices)
   }
   zwayupdategateways(m,mqtt_updates)
   zway_timestampf, err := jsonFloatValue("updateTime",m)
