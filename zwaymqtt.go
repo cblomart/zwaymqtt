@@ -828,8 +828,7 @@ var f MQTT.MessageHandler = func(client *MQTT.Client, msg MQTT.Message) {
   for _, g := range gateways {
     if g.Topic == topic {
       if g.Get() != value {
-        if (debug) { log.Printf("MQTT: %s / Value: %s ",
-          g.ToString(), value ) }
+        log.Printf("MQTT: %s / Value: %s ", g.ToString(), value )
         g.Set(value)
       }
     }
