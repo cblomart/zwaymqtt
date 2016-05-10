@@ -302,7 +302,7 @@ func (g *Gateway) GetValue(update map[string]interface{}) string {
   case "float":
     value, err := jsonFloatValue(g.Key + "." + g.Value,update)
     if err == nil {
-      return fmt.Sprintf("%f", value)
+      return fmt.Sprintf("%.3g", value)
     }
   case "bool":
     value, err := jsonBoolValue(g.Key + "." + g.Value,update)
