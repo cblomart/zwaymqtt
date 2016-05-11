@@ -870,7 +870,7 @@ func (g *Gateway) Set(value string) {
   }
   log.Printf("MQTT: %s / Value: %s ", g.ToString(), value)
   key := g.Key
-  r := regexp.MustCompile("\\.([0-9]+)\\.")
+  r := regexp.MustCompile("\\.([0-9]+)(\\.|$)")
   key = r.ReplaceAllString(key, "[$1].")
   r = regexp.MustCompile("\\.data$")
   key = r.ReplaceAllString(key,"")
@@ -879,6 +879,7 @@ func (g *Gateway) Set(value string) {
     log.Printf("Error updating value: %s", result)
   }
 }
+
 func (g *Gateway) Get() string {
   if (debug) { log.Print("Setting Z-Way value.") }
   key := g.Key
