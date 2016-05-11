@@ -70,10 +70,31 @@ Please use environment variables to configure:
   - Z-Way username = ZWAY_USERNAME
   - Z-Way password = ZWAY_PASSWORD
   - Z-Way refresh rate = ZWAY_REFRESH
+  - Show debug messagees = ZWAYMQTT_DEBUG (set to 'true')
+  
+## Example 
+
+Setup an environment file with the required parametes 
+
+**'/etc/default/zwaymqtt'**
+
+> ZWAY_HOME = zway
+> ZWAY_SERVER = localhost
+> ZWAY_USERNAME = admin
+> ZWAY_PASSWORD = admin
+> ZWAY_REFRESH = 3
+> MQTT_PROTOCOL = tls
+> MQTT_SERVER = localhost
+> MQTT_USERNAME = mqtt
+> MQTT_PASSWORD = mqtt
+
+Run the docker image
+
+> docker run --env-file:/ext/default/zwaymqtt cblomart/zwaymqtt
 
 ## Instalation
 
-### from release
+### From release
 
 On your pi:
 
