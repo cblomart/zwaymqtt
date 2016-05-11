@@ -369,10 +369,16 @@ func init() {
     mqtt_protocol = os.Getenv("MQTT_PROTOCOL")
   }
   
+  if !debug && len(os.Getenv("ZWAYMQTT_DEDUG")) > 0 {
+    if os.Getenv("ZWAYMQTT_DEDUG") == "true" {
+      debug = true
+    }
+  }
+  
   //standardise hostname values to <host>:<port>
   zway_match, err := regexp.MatchString(":[0-9]+$",zway_server)
   if err != nil {
-    log.Fatal("Could not use regexp: %s", err)
+    log.Fatal(fmt.Sprintf("Could not use regexp: %s", err))
   }
   if zway_match == false {
     log.Print("Setting port 8083 on given Z-Way server")
@@ -380,7 +386,7 @@ func init() {
   }
   mqtt_match, err := regexp.MatchString(":[0-9]+$",mqtt_server)
   if err != nil {
-    log.Fatal("Could not use regexp: %s", err)
+    log.Fatal(fmt.Sprintf("Could not use regexp: %s", err))
   }
   if mqtt_match == false {
     log.Print("Setting port 1883 on given MQTT server")
