@@ -883,8 +883,8 @@ func (g *Gateway) Get() string {
 }
 
 func zwayget(api string, path string) (string, error) {
-  if (debug) { log.Print("Http Get on Z-Way.") }
   url := fmt.Sprintf("http://%s%s%s", zway_server, api, path)
+  if (debug) { log.Printf("Http Get on Z-Way: %s", url) }
   req, err := http.NewRequest("GET",url,nil)
   if err != nil {
     return "", err
