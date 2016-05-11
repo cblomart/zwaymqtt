@@ -369,8 +369,8 @@ func init() {
     mqtt_protocol = os.Getenv("MQTT_PROTOCOL")
   }
   
-  if !debug && len(os.Getenv("ZWAYMQTT_DEDUG")) > 0 {
-    if os.Getenv("ZWAYMQTT_DEDUG") == "true" {
+  if !debug && len(os.Getenv("ZWAYMQTT_DEBUG")) > 0 {
+    if os.Getenv("ZWAYMQTT_DEBUG") == "true" {
       debug = true
     }
   }
