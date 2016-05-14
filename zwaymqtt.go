@@ -754,6 +754,32 @@ func zwayparsedevices(update map[string]interface{}) {
           }
         }
       }
+      // check if instance has alarm sensor
+      data, err = zwaygetcmdclassdata(commandClasses,
+        COMMAND_CLASS_ALARM_SENSOR)
+      if err == nil {
+        for k, v := range data {
+          if _, err := strconv.Atoi(k); err == nil {
+            alarm :=  v.(map[string]interface{})
+            alarmType, err := jsonStringValue("typeString.value",
+              alarm)
+            if err != nil {
+              log.Printf("Could not get alarm type: %s", err)
+              continue
+            }
+            nkey := fmt.Sprintf(
+              "devices.%s.instances.%s.commandClasses.%d.data.%s",
+              node, i, COMMAND_CLASS_ALARM_SENSOR,k)
+            topic := fmt.Sprintf("%s/sensors/analogic/%s/%s/%s",
+              zway_home, normName(givenName), i, normName(alarmType))
+            _, err = jsonIntValue("sensorState.value",alarm)
+            if err == nil {
+              gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
+                Value: "sensorState.value", Write:false, Type: "int"})
+            }
+          }
+        }
+      }
     }
   }
 }
