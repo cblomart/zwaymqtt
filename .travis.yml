@@ -13,6 +13,8 @@ services:
 install:
 - make deps
 script:
+- make linux
+before_deploy:
 - make all
 deploy:
   provider: releases
