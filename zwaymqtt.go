@@ -773,10 +773,10 @@ func zwayparsedevices(update map[string]interface{}) {
               node, i, COMMAND_CLASS_ALARM_SENSOR,k)
             topic := fmt.Sprintf("%s/sensors/analogic/%s/%s/%s",
               zway_home, normName(givenName), i, normName(alarmType))
-            _, err = jsonIntValue("sensorState.value",alarm)
+            _, err = jsonFloatValue("sensorState.value",alarm)
             if err == nil {
               gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-                Value: "sensorState.value", Write:false, Type: "int"})
+                Value: "sensorState.value", Write:false, Type: "float"})
             }
           }
         }
