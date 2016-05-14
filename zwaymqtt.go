@@ -45,7 +45,7 @@ var debug bool
 var profile string
 
 //used variables
-var zway_timestamp int = 0
+var zway_timestamp int 
 var zway_dataapi = "/ZWaveAPI/Data/"
 var zway_zautoapi = "/ZAutomation/api/v1/"
 var zway_runapi = "/ZWaveAPI/Run/"
@@ -53,7 +53,7 @@ var zway_cookiename = "ZWAYSession"
 var http_client = new(http.Client)
 var zway_cookie = new(http.Cookie)
 var gateways []Gateway
-var zway_retries int = 0
+var zway_retries int
 
 
 //ZWay enumerations
@@ -72,6 +72,7 @@ const (
   GENERIC_TYPE_MULTILEVEL_SENSOR = 33
   GENERIC_TYPE_METER = 49
   GENERIC_TYPE_ENTRY_CONTROL = 64
+  GENERIC_TYPE_ALARM_SENSOR = 161
   COMMAND_CLASS_NO_OPERATION = 0
   COMMAND_CLASS_BASIC = 32
   COMMAND_CLASS_CONTROLLER_REPLICATION = 33
@@ -279,6 +280,7 @@ var ZWaveTypeNames = [...]string{
   GENERIC_TYPE_MULTILEVEL_SENSOR: "generic multilevel sensor",
   GENERIC_TYPE_METER: "generic meter",
   GENERIC_TYPE_ENTRY_CONTROL: "generic entry control",
+  GENERIC_TYPE_ALARM_SENSOR: "generic alarm sensor",
 }
 
 func (g *Gateway) ToString() string {
@@ -453,7 +455,7 @@ func jsonValue(key string, target map[string]interface{}) (interface{}, error) {
   for i := range keys[:len(keys)-1] {
     value := current[keys[i]]
     if value == nil {
-      return nil, errors.New(fmt.Sprintf("Json Key not existent (%s)", keys[i]))
+      return nil, fmt.Errorf("Json Key not existent (%s)", keys[i])
     }
     current = value.(map[string]interface{})
   }
@@ -541,17 +543,12 @@ func zwayparsedevices(update map[string]interface{}) {
       log.Printf("basic type not found: %s", err)
       continue
     }
-    genericType, err:= jsonFloatValue("data.genericType.value",m)
-    if err != nil {
-      log.Printf("generic type not found: %s", err)
-      continue
-    }
     givenName, err := jsonStringValue("data.givenName.value",m)
     if err != nil {
       log.Printf("given name not found: %s", err)
       continue
     }
-    //specificType := int(jsonFloatValue("data.specificType.value",m))
+    // specificType := int(jsonFloatValue("data.specificType.value",m))
     isControler := false
     switch int(basicType) {
     case BASIC_TYPE_CONTROLER:
@@ -559,212 +556,203 @@ func zwayparsedevices(update map[string]interface{}) {
     case BASIC_TYPE_STATIC_CONTROLER:
       isControler = true
     }
-    //skip if controller
+    // skip if controller
     if isControler {
       log.Printf("Skipping node %s: %s", node, ZWaveTypeNames[int(basicType)])
       continue
     }
-    //skip if no name
+    // skip if no name
     if len(givenName) == 0 {
       log.Printf("given name empty")
       continue
     }
-    //parsing instances
+    // parsing instances
     instances, err := jsonMapValue("instances",m)
     if err != nil {
       continue
     }
     for i := range instances {
+      // get instance
       instance := instances[i].(map[string]interface{})
+      // get command classes from instance
       commandClasses, err := jsonMapValue("commandClasses",instance)
       if err != nil {
         log.Printf("command classes not found: %s", err)
         continue
       }
-      nkey := fmt.Sprintf("devices.%s.instances.%s.commandClasses.%d.data",
-         node, i, COMMAND_CLASS_BATTERY)
-      topic := fmt.Sprintf("%s/sensors/analogic/%s/%s/battery",
-        zway_home, normName(givenName),i)
-      gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-         Value: "last.value", Write:false, Type: "int"})
-      switch int(genericType) {
-      case GENERIC_TYPE_BINARY_SWITCH:
+      // check if instance has battery informations
+      data, err := zwaygetcmdclassdata(commandClasses,
+        COMMAND_CLASS_BATTERY)
+      if err == nil {
+        nkey := fmt.Sprintf("devices.%s.instances.%s.commandClasses.%d.data",
+          node, i, COMMAND_CLASS_BATTERY)
+        topic := fmt.Sprintf("%s/sensors/analogic/%s/%s/battery",
+          zway_home, normName(givenName),i)
+        _, err = jsonFloatValue("last.value",data)
+        if err == nil  {
+          gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
+            Value: "last.value", Write:false, Type: "float"})
+        }
+      }
+      // check if instance has switch binary
+      data, err = zwaygetcmdclassdata(commandClasses,
+        COMMAND_CLASS_SWITCH_BINARY)
+      if err == nil {
         nkey := fmt.Sprintf("devices.%s.instances.%s.commandClasses.%d.data",
            node, i, COMMAND_CLASS_SWITCH_BINARY)
         topic := fmt.Sprintf("%s/actuators/binary/%s/%s/switch",
           zway_home, normName(givenName), i)
-        gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-           Value: "level.value", Write:true, Type: "bool"})
-      case GENERIC_TYPE_MULTILEVEL_SWITCH:
+        _, err = jsonBoolValue("level.value",data)
+        if err == nil {
+          gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
+            Value: "level.value", Write:true, Type: "bool"})          
+        }
+      }
+      // check if instance has switch multilevel
+      data, err = zwaygetcmdclassdata(commandClasses,
+        COMMAND_CLASS_SWITCH_MULTILEVEL)
+      if err == nil {
         nkey := fmt.Sprintf("devices.%s.instances.%s.commandClasses.%d.data",
           node, i, COMMAND_CLASS_SWITCH_MULTILEVEL)
         topic := fmt.Sprintf("%s/actuators/analogic/%s/%s/switch",
           zway_home, normName(givenName),i)
-        gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-           Value: "level.value", Write:true, Type: "float"})
-      case GENERIC_TYPE_BINARY_SENSOR:
-        data, err := zwaygetcmdclassdata(commandClasses,
-          COMMAND_CLASS_SENSOR_BINARY)
-        if err != nil {
-          break
+        _, err = jsonFloatValue("level.value", data)
+        if err == nil {
+          gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
+            Value: "level.value", Write:true, Type: "float"})        
         }
+      }
+      // check if instance has sensor binary
+      data, err = zwaygetcmdclassdata(commandClasses,
+        COMMAND_CLASS_SENSOR_BINARY)
+      if err == nil {
         sensorType := "generic"
         nkey := fmt.Sprintf("devices.%s.instances.%s.commandClasses.%d.data",
           node, i, COMMAND_CLASS_SENSOR_BINARY)
         topic := fmt.Sprintf("%s/sensors/binary/%s/%s/%s",
            zway_home, normName(givenName), i, sensorType)
-        _, err = jsonBoolValue("level.value",update)
+        _, err = jsonBoolValue("level.value",data)
         if err == nil {
             gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
                Value: "level.value", Write:false, Type: "bool"})
-        } else {
-          for k, v := range data {
-            if _, err := strconv.Atoi(k); err == nil {
-              sensor := v.(map[string]interface{})
-              sensorType, err := jsonStringValue("sensorTypeString.value",sensor)
-              if err != nil {
-                log.Printf("Could not get sensor type: %s", err)
-                continue
-              }
-              nkey := fmt.Sprintf(
-                "devices.%s.instances.%s.commandClasses.%d.data.%s",
-                node, i, COMMAND_CLASS_SENSOR_BINARY,k)
-              topic := fmt.Sprintf("%s/sensors/binary/%s/%s/%s",
-                zway_home,normName(givenName), i, normName(sensorType))
-              gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-                 Value: "level.value", Write:false, Type: "bool"})
+        }
+        for k, v := range data {
+          if _, err := strconv.Atoi(k); err == nil {
+            sensor := v.(map[string]interface{})
+            sensorType, err := jsonStringValue("sensorTypeString.value",sensor)
+            if err != nil {
+              log.Printf("Could not get sensor type: %s", err)
+              continue
+            }
+            nnkey := fmt.Sprintf("%s.%s",nkey,k)
+            topic := fmt.Sprintf("%s/sensors/binary/%s/%s/%s",
+              zway_home,normName(givenName), i, normName(sensorType))
+            _, err = jsonBoolValue("level.value",sensor)
+            if err == nil {
+              gateways = append(gateways, Gateway{Key: nnkey, Topic: topic,
+                Value: "level.value", Write:false, Type: "bool"})
             }
           }
         }
-        fallthrough
-      case GENERIC_TYPE_MULTILEVEL_SENSOR:
-        data, err := zwaygetcmdclassdata(commandClasses,
-          COMMAND_CLASS_SENSOR_MULTILEVEL)
-        if err == nil {
-          for k, v := range data {
-            if _, err := strconv.Atoi(k); err == nil {
-              sensor := v.(map[string]interface{})
-              sensorType, err := jsonStringValue("sensorTypeString.value",
-                sensor)
-              if err != nil {
-                log.Printf("Could not get sensor type: %s", err)
-                continue
-              }
-              sensorScale, err := jsonStringValue("scaleString.value",
-                sensor)
-              if err != nil {
-                log.Printf("Could not get sensor scale: %s", err)
-                continue
-              }
-              nkey := fmt.Sprintf(
-                "devices.%s.instances.%s.commandClasses.%d.data.%s",
-                node, i, COMMAND_CLASS_SENSOR_MULTILEVEL,k)
-              topic := fmt.Sprintf("%s/sensors/analogic/%s/%s/%s/%s",
-                zway_home, normName(givenName), i, normName(sensorType),
-                normName(sensorScale))
+      }
+      // check if instance has sensor multilevel
+      data, err = zwaygetcmdclassdata(commandClasses,
+        COMMAND_CLASS_SENSOR_MULTILEVEL)
+      if err == nil {
+        for k, v := range data {
+          if _, err := strconv.Atoi(k); err == nil {
+            sensor := v.(map[string]interface{})
+            sensorType, err := jsonStringValue("sensorTypeString.value",
+              sensor)
+            if err != nil {
+              log.Printf("Could not get sensor type: %s", err)
+              continue
+            }
+            sensorScale, err := jsonStringValue("scaleString.value",
+              sensor)
+            if err != nil {
+              log.Printf("Could not get sensor scale: %s", err)
+              continue
+            }
+            nkey := fmt.Sprintf(
+              "devices.%s.instances.%s.commandClasses.%d.data.%s",
+              node, i, COMMAND_CLASS_SENSOR_MULTILEVEL,k)
+            topic := fmt.Sprintf("%s/sensors/analogic/%s/%s/%s/%s",
+              zway_home, normName(givenName), i, normName(sensorType),
+              normName(sensorScale))
+            _, err = jsonFloatValue("val.value",sensor)
+            if err == nil {  
               gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-                 Value: "val.value", Write:false, Type: "float"})
+                Value: "val.value", Write:false, Type: "float"})
             }
           }
         }
-      case GENERIC_TYPE_METER:
-        data, err := zwaygetcmdclassdata(commandClasses,COMMAND_CLASS_METER)
-        if err == nil {
-          for k, v := range data {
-            if _, err := strconv.Atoi(k); err == nil {
-              sensor := v.(map[string]interface{})
-              sensorType, err := jsonStringValue("sensorTypeString.value",
-                sensor)
-              if err != nil {
-                log.Printf("Could not get sensor type: %s", err)
-                continue
-              }
-              sensorScale, err := jsonStringValue("scaleString.value",
-                sensor)
-              if err != nil {
-                log.Printf("Could not get sensor scale: %s", err)
-                continue
-              }
-              nkey := fmt.Sprintf(
-                "devices.%s.instances.%s.commandClasses.%d.data.%s",
-                node, i, COMMAND_CLASS_METER,k)
-              topic := fmt.Sprintf("%s/sensors/analogic/%s/%s/%s/%s",
-                zway_home, normName(givenName), i, normName(sensorType),
-                normName(sensorScale))
+      }
+      // check if instance has meter
+      data, err = zwaygetcmdclassdata(commandClasses,
+        COMMAND_CLASS_METER)
+      if err == nil {
+        for k, v := range data {
+          if _, err := strconv.Atoi(k); err == nil {
+            sensor := v.(map[string]interface{})
+            sensorType, err := jsonStringValue("sensorTypeString.value",
+              sensor)
+            if err != nil {
+              log.Printf("Could not get sensor type: %s", err)
+              continue
+            }
+            sensorScale, err := jsonStringValue("scaleString.value",
+              sensor)
+            if err != nil {
+            log.Printf("Could not get sensor scale: %s", err)
+              continue
+            }
+            nkey := fmt.Sprintf(
+              "devices.%s.instances.%s.commandClasses.%d.data.%s",
+              node, i, COMMAND_CLASS_METER,k)
+            topic := fmt.Sprintf("%s/sensors/analogic/%s/%s/%s/%s",
+              zway_home, normName(givenName), i, normName(sensorType),
+              normName(sensorScale))
+            _, err = jsonFloatValue("val.value",sensor)
+            if err == nil {  
               gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-                 Value: "val.value", Write:false, Type: "float"})
+                Value: "val.value", Write:false, Type: "float"})
             }
           }
         }
-      case GENERIC_TYPE_THERMOSTAT:
-        //get the binary switch to enable/disable thermostat
-        nkey := fmt.Sprintf("devices.%s.instances.%s.commandClasses.%d.data",
-           node, i, COMMAND_CLASS_SWITCH_BINARY)
-        topic := fmt.Sprintf("%s/actuators/binary/%s/%s/switch",
-          zway_home, normName(givenName), i)
-        gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-           Value: "level.value", Write:true, Type: "bool"})
-        //TODO: informations about set point
-        data, err := zwaygetcmdclassdata(commandClasses,
-          COMMAND_CLASS_THERMOSTAT_SET_POINT)
-        if err == nil {
-          for k, v := range data {
-            if _, err := strconv.Atoi(k); err == nil {
-              setpoint :=  v.(map[string]interface{})
-              setpointType, err := jsonStringValue("modeName.value",
-                setpoint)
-              if err != nil {
-                log.Printf("Could not get set point mode: %s", err)
-                continue
-              }
-              setpointScale, err := jsonStringValue("scaleString.value",
-                setpoint)
-              if err != nil {
-                log.Printf("Could not get setpoint scale: %s", err)
-                continue
-              }
-              nkey := fmt.Sprintf(
-                "devices.%s.instances.%s.commandClasses.%d.data.%s",
-                node, i, COMMAND_CLASS_THERMOSTAT_SET_POINT,k)
-              topic := fmt.Sprintf("%s/actuators/analogic/%s/%s/%s/%s",
-                zway_home, normName(givenName), i, normName(setpointType),
-                normName(setpointScale))
+      }
+      // check if instance has thermostat set point
+      data, err = zwaygetcmdclassdata(commandClasses,
+        COMMAND_CLASS_THERMOSTAT_SET_POINT)
+      if err == nil {
+        for k, v := range data {
+          if _, err := strconv.Atoi(k); err == nil {
+            setpoint :=  v.(map[string]interface{})
+            setpointType, err := jsonStringValue("modeName.value",
+              setpoint)
+            if err != nil {
+              log.Printf("Could not get set point mode: %s", err)
+              continue
+            }
+            setpointScale, err := jsonStringValue("scaleString.value",
+              setpoint)
+            if err != nil {
+              log.Printf("Could not get setpoint scale: %s", err)
+              continue
+            }
+            nkey := fmt.Sprintf(
+              "devices.%s.instances.%s.commandClasses.%d.data.%s",
+              node, i, COMMAND_CLASS_THERMOSTAT_SET_POINT,k)
+            topic := fmt.Sprintf("%s/actuators/analogic/%s/%s/%s/%s",
+              zway_home, normName(givenName), i, normName(setpointType),
+              normName(setpointScale))
+            _, err = jsonIntValue("val.value",setpoint)
+            if err == nil {
               gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-                 Value: "val.value", Write:true, Type: "int"})
+                Value: "val.value", Write:true, Type: "int"})
             }
           }
         }
-        data, err = zwaygetcmdclassdata(commandClasses,
-          COMMAND_CLASS_SENSOR_MULTILEVEL)
-        if err == nil {
-          for k, v := range data {
-            if _, err := strconv.Atoi(k); err == nil {
-              sensor := v.(map[string]interface{})
-              sensorType, err := jsonStringValue("sensorTypeString.value",
-                sensor)
-              if err != nil {
-                log.Printf("Could not get sensor type: %s", err)
-                continue
-              }
-              sensorScale, err := jsonStringValue("scaleString.value",
-                sensor)
-              if err != nil {
-                log.Printf("Could not get sensor scale: %s", err)
-                continue
-              }
-              nkey := fmt.Sprintf(
-                "devices.%s.instances.%s.commandClasses.%d.data.%s",
-                node, i, COMMAND_CLASS_SENSOR_MULTILEVEL,k)
-              topic := fmt.Sprintf("%s/sensors/analogic/%s/%s/%s/%s",
-                zway_home, normName(givenName), i, normName(sensorType),
-                normName(sensorScale))
-              gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-                 Value: "val.value", Write:false, Type: "float"})
-            }
-          }
-        }
-      default:
-        log.Printf("device not implemented: type: %f / name: %s", genericType, givenName)
       }
     }
   }
@@ -996,7 +984,7 @@ func main() {
         if zway_retries < 3 {
           log.Printf("Reinitializing Z-Way for the %d time.", zway_retries)
           authzway()
-          zway_retries += 1
+          zway_retries++
         } else {
           log.Print("Already tested 3 times: stop")
           <-quit
