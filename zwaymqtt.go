@@ -29,6 +29,7 @@ type Gateway struct {
   Value string
   Write bool
   Type string
+  Args []string
 }
 
 //command line variable
@@ -749,7 +750,7 @@ func zwayparsedevices(update map[string]interface{}) {
             _, err = jsonIntValue("val.value",setpoint)
             if err == nil {
               gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-                Value: "val.value", Write:true, Type: "int"})
+                Value: "val.value", Write:true, Type: "int", Args: []string{ setpointType, } })
             }
           }
         }
@@ -888,7 +889,13 @@ func (g *Gateway) Set(value string) {
   key = r.ReplaceAllString(key, "[$1].")
   r = regexp.MustCompile("\\.data$")
   key = r.ReplaceAllString(key,"")
-  result, _ := zwayget(zway_runapi,fmt.Sprintf("%s.Set(%s)", key, value))
+  args := ""
+  if g.Args != nil {
+      for _, v := range g.Args {
+          args += fmt.Sprintf("'%s',", v)
+      }
+  } 
+  result, _ := zwayget(zway_runapi,fmt.Sprintf("%s.Set(%s%s)", key, args, value))
   if result != "null" {
     log.Printf("Error updating value: %s", result)
   }
