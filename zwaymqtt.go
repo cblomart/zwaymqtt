@@ -307,7 +307,8 @@ func (g *Gateway) GetValue(update map[string]interface{}) string {
     if err == nil {
       v := fmt.Sprintf("%.3f", value)
       if strings.Contains(v,".") {
-        v = strings.TrimRight(v,"0.")
+        r := regexp.MustCompile("\\.*0*$")
+        v = r.ReplaceAllString(v,"")
       }
       return v
     }
