@@ -481,7 +481,7 @@ func jsonIntValue(key string, target map[string]interface{}) (int, error) {
   if err != nil {
     return 0, err
   }
-  return iface.(int), nil
+  return int(iface.(float64)), nil
 }
 
 func jsonFloatValue(key string, target map[string]interface{}) (float64, error) {
@@ -750,7 +750,7 @@ func zwayparsedevices(update map[string]interface{}) {
             _, err = jsonFloatValue("val.value",setpoint)
             if err == nil {
               gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-                Value: "val.value", Write:true, Type: "float", Args: []string{ setpointType, } })
+                Value: "val.value", Write:true, Type: "float", Args: []string{ k, } })
             }
           }
         }
@@ -887,7 +887,7 @@ func (g *Gateway) Set(value string) {
   key := g.Key
   r := regexp.MustCompile("\\.([0-9]+)(\\.|$)")
   key = r.ReplaceAllString(key, "[$1].")
-  r = regexp.MustCompile("\\.data$")
+  r = regexp.MustCompile("\\.data.*$")
   key = r.ReplaceAllString(key,"")
   key = strings.TrimRight(key,".")
   args := ""
@@ -907,8 +907,6 @@ func (g *Gateway) Get() string {
   key := g.Key
   r := regexp.MustCompile("\\.([0-9]+)(\\.|$)")
   key = r.ReplaceAllString(key, "[$1].")
-  r = regexp.MustCompile("\\.data$")
-  key = r.ReplaceAllString(key,"")
   key = strings.TrimRight(key,".")
   result, _ := zwayget(zway_runapi, fmt.Sprintf("%s.%s", key, g.Value))
   return result
