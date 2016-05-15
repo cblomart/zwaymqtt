@@ -747,10 +747,10 @@ func zwayparsedevices(update map[string]interface{}) {
             topic := fmt.Sprintf("%s/actuators/analogic/%s/%s/%s/%s",
               zway_home, normName(givenName), i, normName(setpointType),
               normName(setpointScale))
-            _, err = jsonIntValue("val.value",setpoint)
+            _, err = jsonFloatValue("val.value",setpoint)
             if err == nil {
               gateways = append(gateways, Gateway{Key: nkey, Topic: topic,
-                Value: "val.value", Write:true, Type: "int", Args: []string{ setpointType, } })
+                Value: "val.value", Write:true, Type: "float", Args: []string{ setpointType, } })
             }
           }
         }
