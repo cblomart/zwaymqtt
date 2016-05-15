@@ -859,12 +859,13 @@ func (g *Gateway) Set(value string) {
   if g.Get() == value {
     if (debug) { log.Printf("MQTT: %s / Value not changed", g.ToString()) }
     return
-  }
+  }  
   //check value
   switch g.Type {
     case "int":
       if strings.Contains(value,".") {
-        value = strings.TrimRight(value,"0.")
+        r := regexp.MustCompile("\\.*0*$")
+        value = r.ReplaceAllString(value,"")
       }
       i, err := strconv.Atoi(value)
       if err != nil {
@@ -874,7 +875,8 @@ func (g *Gateway) Set(value string) {
       value = fmt.Sprintf("%d",i)
     case "float":
       if strings.Contains(value,".") {
-        value = strings.TrimRight(value,"0.")
+        r := regexp.MustCompile("\\.*0*$")
+        value = r.ReplaceAllString(value,"")
       }
       f, err := strconv.ParseFloat(value,64)
       if err != nil {
