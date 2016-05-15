@@ -896,7 +896,12 @@ func (g *Gateway) Set(value string) {
   args := ""
   if g.Args != nil {
       for _, v := range g.Args {
+        r := regexp.MustCompile("^[0-9]+(.[0-9]+)*$")
+        if r.MatchString(v) {
+          args += fmt.Sprintf("%s,", v)
+        } else {
           args += fmt.Sprintf("'%s',", v)
+        }
       }
   } 
   result, _ := zwayget(zway_runapi,fmt.Sprintf("%s.Set(%s%s)", key, args, value))
