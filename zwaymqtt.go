@@ -889,6 +889,7 @@ func (g *Gateway) Set(value string) {
   key = r.ReplaceAllString(key, "[$1].")
   r = regexp.MustCompile("\\.data$")
   key = r.ReplaceAllString(key,"")
+  key = strings.TrimRight(key,".")
   args := ""
   if g.Args != nil {
       for _, v := range g.Args {
@@ -904,8 +905,11 @@ func (g *Gateway) Set(value string) {
 func (g *Gateway) Get() string {
   if (debug) { log.Print("Setting Z-Way value.") }
   key := g.Key
-  r := regexp.MustCompile("\\.([0-9]+)\\.")
+  r := regexp.MustCompile("\\.([0-9]+)(\\.|$)")
   key = r.ReplaceAllString(key, "[$1].")
+  r = regexp.MustCompile("\\.data$")
+  key = r.ReplaceAllString(key,"")
+  key = strings.TrimRight(key,".")
   result, _ := zwayget(zway_runapi, fmt.Sprintf("%s.%s", key, g.Value))
   return result
 }
