@@ -3,6 +3,8 @@
 
 A simple Z-Way to MQTT bridge in GO.
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/cblomart/zwaymqtt)](https://goreportcard.com/report/github.com/cblomart/zwaymqtt)
+
 [![Build Status](https://drone.io/github.com/cblomart/zwaymqtt/status.png)](https://drone.io/github.com/cblomart/zwaymqtt/latest)
 
 [![Build Status](https://travis-ci.org/cblomart/zwaymqtt.svg?branch=master)](https://travis-ci.org/cblomart/zwaymqtt)
